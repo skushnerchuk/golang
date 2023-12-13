@@ -39,7 +39,8 @@ func calcCounterValue(char rune) int {
 func splitToTokens(data []rune) ([]Token, error) {
 	result := make([]Token, 0)
 	for i := 0; i < len(data); i++ {
-		if i > 0 && unicode.IsDigit(data[i]) {
+		// Если нам попалась цифра - значит строка неверная
+		if unicode.IsDigit(data[i]) {
 			return nil, ErrInvalidString
 		}
 		count := 1
