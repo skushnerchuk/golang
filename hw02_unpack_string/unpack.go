@@ -39,8 +39,8 @@ func calcCounterValue(char rune) int {
 func splitToTokens(data []rune) ([]Token, error) {
 	result := make([]Token, 0)
 	for i := 0; i < len(data); i++ {
-		if unicode.IsDigit(data[i]) {
-			continue
+		if i > 0 && unicode.IsDigit(data[i]) {
+			return nil, ErrInvalidString
 		}
 		count := 1
 		char := string(data[i])
@@ -48,12 +48,12 @@ func splitToTokens(data []rune) ([]Token, error) {
 		if data[i] == Backslash {
 			// Перескакиваем на экранированный символ
 			i++
+			char = string(data[i])
 			if !isCorrectEscapedChar(data[i]) {
 				return nil, ErrInvalidString
 			}
-			char = string(data[i])
 			// Если за экранируемым символом есть цифра, запоминаем ее в счетчике повторений и перескакиваем эту цифру
-			if i+1 < len(data) && unicode.IsDigit(data[i+1]) {
+			if len(data) > i+1 && unicode.IsDigit(data[i+1]) {
 				count = calcCounterValue(data[i+1])
 				i++
 			}
@@ -66,18 +66,17 @@ func splitToTokens(data []rune) ([]Token, error) {
 	return result, nil
 }
 
-var incorrectRegexp = regexp.MustCompile(`^\d|[^\\]\d{2,}`)
+var startWithDigitRegexp = regexp.MustCompile(`^\d|[^\\]\d{2,}`)
 
 // Проверка, что входная строка соответствует требуемому формату:
 //   - не представляет собой число
 //   - не начинается с цифры
-//   - не содержит идущие подряд 2 и более числа, если перед первым нет \
 //   - не заканчивается на символ экранирования
 //
 // Проверка корректности экранируемых блоков осуществляется при разбивке в функции splitToTokens.
 func isCorrectString(data string) bool {
 	_, err := strconv.Atoi(data)
-	incorrect := incorrectRegexp.FindString(data)
+	incorrect := startWithDigitRegexp.FindString(data)
 	return err != nil && incorrect == "" && !strings.HasSuffix(data, "\\")
 }
 
