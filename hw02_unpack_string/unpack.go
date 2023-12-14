@@ -68,7 +68,7 @@ func splitToTokens(data []rune) ([]Token, error) {
 // Unpack Распаковка строки с поддержкой экранировки
 // Допускается экранирование цифр и символа "\".
 func Unpack(data string) (string, error) {
-	if strings.HasSuffix(data, "\\") && len(data) < 2 {
+	if strings.HasSuffix(data, "\\") && data != `\\` {
 		return "", ErrInvalidString
 	}
 
