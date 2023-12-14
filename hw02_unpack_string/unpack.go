@@ -2,8 +2,6 @@ package unpack
 
 import (
 	"errors"
-	"regexp"
-	"strconv"
 	"strings"
 	"unicode"
 )
@@ -67,24 +65,10 @@ func splitToTokens(data []rune) ([]Token, error) {
 	return result, nil
 }
 
-var startWithDigitRegexp = regexp.MustCompile(`^\d|[^\\]\d{2,}`)
-
-// Проверка, что входная строка соответствует требуемому формату:
-//   - не представляет собой число
-//   - не начинается с цифры
-//   - не заканчивается на символ экранирования
-//
-// Проверка корректности экранируемых блоков осуществляется при разбивке в функции splitToTokens.
-func isCorrectString(data string) bool {
-	_, err := strconv.Atoi(data)
-	incorrect := startWithDigitRegexp.FindString(data)
-	return err != nil && incorrect == "" && !strings.HasSuffix(data, "\\")
-}
-
 // Unpack Распаковка строки с поддержкой экранировки
 // Допускается экранирование цифр и символа "\".
 func Unpack(data string) (string, error) {
-	if !isCorrectString(data) {
+	if strings.HasSuffix(data, "\\") {
 		return "", ErrInvalidString
 	}
 
