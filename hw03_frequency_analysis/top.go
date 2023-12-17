@@ -1,4 +1,4 @@
-package hw03_frequency_analysis
+package topwords
 
 import (
 	"sort"
