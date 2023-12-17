@@ -1,8 +1,9 @@
 package topwords
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var Text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
