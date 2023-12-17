@@ -52,6 +52,7 @@ func TestTop10(t *testing.T) {
 			{text: "dog,cat, dog...cat, dogcat", expectedLen: 3},
 			{text: "Нога, нога, нога!, нога,, нога'", expectedLen: 1},
 			{text: "какой-то, какойто", expectedLen: 2},
+			{text: "cat and dog, one dog,two cats and one man", expectedLen: 7},
 		}
 		for _, tc := range tests {
 			tc := tc
