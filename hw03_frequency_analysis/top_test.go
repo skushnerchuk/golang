@@ -1,15 +1,11 @@
-package hw03frequencyanalysis
+package hw03_frequency_analysis
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
-// Change to true if needed.
-var taskWithAsteriskIsCompleted = false
-
-var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
+var Text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
 	ступеньки собственным затылком:  бум-бум-бум.  Другого  способа
 	сходить  с  лестницы  он  пока  не  знает.  Иногда ему, правда,
@@ -44,39 +40,40 @@ var text = `Как видите, он  спускается  по  лестни�
 		В этот вечер...`
 
 func TestTop10(t *testing.T) {
-	t.Run("no words in empty string", func(t *testing.T) {
-		require.Len(t, Top10(""), 0)
+	t.Run("", func(t *testing.T) {
+		tests := []struct {
+			text        string
+			expectedLen int
+		}{
+			{text: "", expectedLen: 0},
+			{text: "-", expectedLen: 0},
+			{text: "-------", expectedLen: 1},
+			{text: "dog,cat, dog...cat, dogcat", expectedLen: 3},
+			{text: "Нога, нога, нога!, нога,, нога'", expectedLen: 1},
+			{text: "какой-то, какойто", expectedLen: 2},
+		}
+		for _, tc := range tests {
+			tc := tc
+			t.Run(tc.text, func(t *testing.T) {
+				result := Top10(tc.text)
+				require.Equal(t, tc.expectedLen, len(result))
+			})
+		}
 	})
 
 	t.Run("positive test", func(t *testing.T) {
-		if taskWithAsteriskIsCompleted {
-			expected := []string{
-				"а",         // 8
-				"он",        // 8
-				"и",         // 6
-				"ты",        // 5
-				"что",       // 5
-				"в",         // 4
-				"его",       // 4
-				"если",      // 4
-				"кристофер", // 4
-				"не",        // 4
-			}
-			require.Equal(t, expected, Top10(text))
-		} else {
-			expected := []string{
-				"он",        // 8
-				"а",         // 6
-				"и",         // 6
-				"ты",        // 5
-				"что",       // 5
-				"-",         // 4
-				"Кристофер", // 4
-				"если",      // 4
-				"не",        // 4
-				"то",        // 4
-			}
-			require.Equal(t, expected, Top10(text))
+		expected := []string{
+			"а",         // 8
+			"он",        // 8
+			"и",         // 6
+			"ты",        // 5
+			"что",       // 5
+			"в",         // 4
+			"его",       // 4
+			"если",      // 4
+			"кристофер", // 4
+			"не",        // 4
 		}
+		require.Equal(t, expected, Top10(Text))
 	})
 }
