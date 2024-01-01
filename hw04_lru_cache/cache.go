@@ -37,7 +37,8 @@ func (l *lruCache) Set(key Key, v interface{}) bool {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	// Если такой элемент уже есть в кэше, перемещаем его на первое место
+	// Если такой элемент уже есть в кэше, перемещаем его
+	// на первое место и обновляем его значение
 	if _, ok := l.items[key]; ok {
 		l.queue.MoveToFront(l.items[key])
 		l.queue.Front().Value = &cacheItem{key: key, value: v}
