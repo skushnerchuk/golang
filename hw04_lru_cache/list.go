@@ -22,84 +22,87 @@ type list struct {
 	tail   *ListItem
 }
 
+// Len Получение длины списка
 func (l *list) Len() int {
 	return l.length
 }
 
+// Front Получение ссылки на головной элемент списка
 func (l *list) Front() *ListItem {
 	return l.head
 }
 
+// Back Получение ссылки на последний элемент списка
 func (l *list) Back() *ListItem {
 	return l.tail
 }
 
+// PushFront Размещение элемента в начале списка
 func (l *list) PushFront(v interface{}) *ListItem {
-	newValue := new(ListItem)
-	newValue.Value = v
-	if l.tail == nil && l.head == nil {
-		l.head = newValue
-		l.tail = newValue
+	item := &ListItem{Value: v}
+	if l.head != nil {
+		item.Next = l.head
+		l.head.Prev = item
 	} else {
-		newValue.Next = l.head
-		l.head = newValue
+		l.tail = item
 	}
+	l.head = item
 	l.length++
-	return newValue
+	return item
 }
 
+// PushBack Размещение элемента в конце списка
 func (l *list) PushBack(v interface{}) *ListItem {
-	newValue := new(ListItem)
-	newValue.Value = v
-	if l.tail == nil && l.head == nil {
-		l.head = newValue
-		l.tail = newValue
+	item := &ListItem{Value: v}
+	if l.tail != nil {
+		item.Prev = l.tail
+		l.tail.Next = item
 	} else {
-		newValue.Prev = l.tail
-		l.tail.Next = newValue
-		l.tail = newValue
+		l.head = item
 	}
+	l.tail = item
 	l.length++
-	return newValue
+	return item
 }
 
+// Remove Удаление элемента из списка
 func (l *list) Remove(item *ListItem) {
 	if item == nil || l.length == 0 {
 		return
 	}
-	prev := item.Prev
-	next := item.Next
-	switch {
-	// Если элемент всего один в списке - обнуляем указатели на начало и конец
-	case prev == nil && next == nil:
-		l.tail = nil
-		l.head = nil
-	// Если это первый в списке элемент, переключаем указатель начала на следующий
-	// и обнуляем указатель на удаляемый элемент
-	case prev == nil:
-		l.head = next
-		next.Prev = nil
-	// Если это последний элемент в списке, переключаем указатель на предыдущий и обнуляем в нем
-	// указатель на удаляемый элемент
-	case next == nil:
-		l.tail = prev
-		prev.Next = nil
-	// Если удаляем из середины списка, то замыкаем указатели соседних элементов друг на друга
-	default:
-		prev.Next = next
-		next.Prev = prev
+
+	// Если удаляется первый элемент списка - говорим что следующий
+	// элемент становится первым, иначе замыкаем соседние элементы друг на друга
+	if item.Prev == nil {
+		l.head = item.Next
+		item.Next.Prev = nil
+	} else {
+		item.Prev.Next = item.Next
 	}
+
+	// Если удаляется последний элемент списка - говорим что предыдущий
+	// элемент становится последним, иначе замыкаем соседние элементы друг на друга
+	if item.Next == nil {
+		l.tail = item.Prev
+		item.Prev.Next = nil
+	} else {
+		item.Next.Prev = item.Prev
+	}
+
 	l.length--
 }
 
+// MoveToFront Перемещение элемента в начало списка
 func (l *list) MoveToFront(item *ListItem) {
-	if item != nil {
+	// Если передан существующий объект и это не голова списка, то выполняем его перемещение
+	if item != nil && l.head != item {
 		itemValue := item.Value
 		l.Remove(item)
 		l.PushFront(itemValue)
 	}
 }
 
+// NewList Создание нового списка
 func NewList() List {
 	return new(list)
 }
