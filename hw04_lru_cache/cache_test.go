@@ -67,7 +67,7 @@ func TestCache(t *testing.T) {
 		_ = c.Set("1", 1)
 		_ = c.Set("2", 2)
 		_ = c.Set("3", 3)
-		_ = c.Set("4", 1)
+		_ = c.Set("4", 4)
 
 		_, ok := c.Get("1")
 		require.False(t, ok)
@@ -82,7 +82,7 @@ func TestCache(t *testing.T) {
 		_, _ = c.Get("1")
 		_, _ = c.Get("2")
 		_, _ = c.Get("3")
-		_ = c.Set("3", 4)
+		_ = c.Set("3", 3)
 		_ = c.Set("2", 2)
 		_ = c.Set("1", 1)
 		_ = c.Set("4", 4)
