@@ -47,7 +47,7 @@ func (l *lruCache) Set(key Key, v interface{}) bool {
 	}
 
 	// Если пытаемся добавить новый элемент с превышением ёмкости
-	// кэша - отстреливаем из него самый старый элемент
+	// кэша - отстреливаем самый старый элемент
 	if l.queue.Len() == l.capacity {
 		delete(l.items, l.queue.Back().Value.(*cacheItem).key)
 		l.queue.Remove(l.queue.Back())
