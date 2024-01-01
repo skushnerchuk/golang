@@ -22,22 +22,22 @@ type list struct {
 	tail   *ListItem
 }
 
-// Len Получение длины списка
+// Len Получение длины списка.
 func (l *list) Len() int {
 	return l.length
 }
 
-// Front Получение ссылки на головной элемент списка
+// Front Получение ссылки на головной элемент списка.
 func (l *list) Front() *ListItem {
 	return l.head
 }
 
-// Back Получение ссылки на последний элемент списка
+// Back Получение ссылки на последний элемент списка.
 func (l *list) Back() *ListItem {
 	return l.tail
 }
 
-// PushFront Размещение элемента в начале списка
+// PushFront Размещение элемента в начале списка.
 func (l *list) PushFront(v interface{}) *ListItem {
 	item := &ListItem{Value: v}
 	if l.head != nil {
@@ -51,7 +51,7 @@ func (l *list) PushFront(v interface{}) *ListItem {
 	return item
 }
 
-// PushBack Размещение элемента в конце списка
+// PushBack Размещение элемента в конце списка.
 func (l *list) PushBack(v interface{}) *ListItem {
 	item := &ListItem{Value: v}
 	if l.tail != nil {
@@ -65,7 +65,7 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	return item
 }
 
-// Remove Удаление элемента из списка
+// Remove Удаление элемента из списка.
 func (l *list) Remove(item *ListItem) {
 	if item == nil || l.length == 0 {
 		return
@@ -92,7 +92,7 @@ func (l *list) Remove(item *ListItem) {
 	l.length--
 }
 
-// MoveToFront Перемещение элемента в начало списка
+// MoveToFront Перемещение элемента в начало списка.
 func (l *list) MoveToFront(item *ListItem) {
 	// Если передан существующий объект и это не голова списка, то выполняем его перемещение
 	if item != nil && l.head != item {
@@ -102,7 +102,7 @@ func (l *list) MoveToFront(item *ListItem) {
 	}
 }
 
-// NewList Создание нового списка
+// NewList Создание нового списка.
 func NewList() List {
 	return new(list)
 }

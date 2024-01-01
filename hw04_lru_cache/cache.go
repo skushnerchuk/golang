@@ -32,7 +32,7 @@ func NewCache(capacity int) Cache {
 	}
 }
 
-// Set Обновление элемента или установка нового в кэш
+// Set Обновление элемента или установка нового в кэш.
 func (l *lruCache) Set(key Key, v interface{}) bool {
 	l.lock.Lock()
 	defer l.lock.Unlock()
@@ -57,7 +57,7 @@ func (l *lruCache) Set(key Key, v interface{}) bool {
 	return false
 }
 
-// Get Получение элемента из кэша по ключу
+// Get Получение элемента из кэша по ключу.
 func (l *lruCache) Get(key Key) (interface{}, bool) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
@@ -72,7 +72,7 @@ func (l *lruCache) Get(key Key) (interface{}, bool) {
 	return nil, false
 }
 
-// Clear Очистка кэша
+// Clear Очистка кэша.
 func (l *lruCache) Clear() {
 	l.lock.Lock()
 	defer l.lock.Unlock()
