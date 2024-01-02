@@ -90,6 +90,27 @@ func TestCache(t *testing.T) {
 		_, ok := c.Get("3")
 		require.False(t, ok)
 	})
+
+	t.Run("check capacity", func(t *testing.T) {
+		c := NewCache(3)
+		_ = c.Set("1", 1)
+		_ = c.Set("2", 2)
+		_ = c.Set("3", 3)
+
+		_, ok1 := c.Get("1")
+		_, ok2 := c.Get("2")
+		_, ok3 := c.Get("3")
+
+		require.True(t, ok1 && ok2 && ok3)
+
+		_ = c.Set("4", 4)
+
+		_, ok1 = c.Get("2")
+		_, ok2 = c.Get("3")
+		_, ok3 = c.Get("4")
+
+		require.True(t, ok1 && ok2 && ok3)
+	})
 }
 
 func TestCacheMultithreading(_ *testing.T) {

@@ -71,6 +71,14 @@ func (l *list) Remove(item *ListItem) {
 		return
 	}
 
+	l.length--
+
+	if l.head == l.tail {
+		l.head = nil
+		l.tail = nil
+		return
+	}
+
 	// Если удаляется первый элемент списка - говорим что следующий
 	// элемент становится первым, иначе замыкаем соседние элементы друг на друга
 	if item.Prev == nil {
@@ -88,8 +96,6 @@ func (l *list) Remove(item *ListItem) {
 	} else {
 		item.Next.Prev = item.Prev
 	}
-
-	l.length--
 }
 
 // MoveToFront Перемещение элемента в начало списка.
