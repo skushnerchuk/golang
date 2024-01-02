@@ -15,17 +15,29 @@ func TestList(t *testing.T) {
 		require.Nil(t, l.Back())
 	})
 
+	t.Run("remove single", func(t *testing.T) {
+		l := NewList()
+		item := l.PushBack(20)
+		l.Remove(item)
+		require.Equal(t, 0, l.Len())
+	})
+
 	t.Run("complex", func(t *testing.T) {
 		l := NewList()
 
-		l.PushFront(10) // [10]
-		l.PushBack(20)  // [10, 20]
-		l.PushBack(30)  // [10, 20, 30]
+		l.PushBack(20)  // [20]
+		l.PushBack(30)  // [20, 30]
+		l.PushFront(10) // [10, 20, 30]
 		require.Equal(t, 3, l.Len())
 
-		middle := l.Front().Next // 20
-		l.Remove(middle)         // [10, 30]
+		middle := l.Back().Prev // 20
+		require.Equal(t, 20, middle.Value)
+		middle = l.Front().Next // 20
+		require.Equal(t, 20, middle.Value)
+		l.Remove(middle) // [10, 30]
 		require.Equal(t, 2, l.Len())
+		require.Equal(t, 10, l.Front().Value)
+		require.Equal(t, 30, l.Back().Value)
 
 		for i, v := range [...]int{40, 50, 60, 70, 80} {
 			if i%2 == 0 {
