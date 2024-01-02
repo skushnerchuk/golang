@@ -1,4 +1,4 @@
-module github.com/skushnerchuk/hw04_lru_cache
+module github.com/skushnerchuk/golang/hw04_lru_cache
 
 go 1.21
 
