@@ -67,4 +67,77 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("tasks with errors but maxErrorsCount <= 0", func(t *testing.T) {
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+		var sumTime time.Duration
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			sumTime += taskSleep
+
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return fmt.Errorf("error from task %d", i)
+			})
+		}
+
+		workersCount := 5
+
+		err := Run(tasks, workersCount, 0)
+		require.NoError(t, err)
+		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+
+		runTasksCount = 0
+		err = Run(tasks, workersCount, -1)
+		require.NoError(t, err)
+		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+	})
+
+	t.Run("concurrency test", func(t *testing.T) {
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+		var sumTime time.Duration
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			sumTime += taskSleep
+
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 2
+		maxErrorsCount := 1
+
+		var err error
+
+		require.Eventually(t, func() bool {
+			err = Run(tasks, workersCount, maxErrorsCount)
+			return true
+		}, sumTime, 1)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("incorrect workers count", func(t *testing.T) {
+		tasks := make([]Task, 0, 50)
+		err := Run(tasks, 0, 0)
+		require.Truef(t, errors.Is(err, ErrIncorrectWorkersCount), "actual err - %v", err)
+	})
+
+	t.Run("empty tasks slice", func(t *testing.T) {
+		tasks := make([]Task, 0)
+		err := Run(tasks, 1, 1)
+		require.NoError(t, err)
+	})
 }
