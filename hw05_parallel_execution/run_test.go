@@ -140,4 +140,29 @@ func TestRun(t *testing.T) {
 		err := Run(tasks, 1, 1)
 		require.NoError(t, err)
 	})
+
+	t.Run("check if <nil> in tasks slice has <nil>", func(t *testing.T) {
+		var realTaskCount int32 = 2
+		tasks := make([]Task, 0)
+
+		var runTasksCount int32
+
+		tasks = append(tasks, func() error {
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+			atomic.AddInt32(&runTasksCount, 1)
+			return nil
+		})
+		tasks = append(tasks, nil)
+		tasks = append(tasks, func() error {
+			time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+			atomic.AddInt32(&runTasksCount, 1)
+			return nil
+		})
+
+		workersCount := 2
+		maxErrorsCount := 1
+		_ = Run(tasks, workersCount, maxErrorsCount)
+
+		require.Equal(t, runTasksCount, realTaskCount, "extra tasks were started")
+	})
 }

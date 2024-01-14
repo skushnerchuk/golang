@@ -21,24 +21,26 @@ func Run(tasks []Task, maxWorkersCount, maxErrorsCount int) error {
 	var errCounter int32
 	maxErrorsCount32 := int32(maxErrorsCount)
 
-	taskChannel := make(chan Task, len(tasks))
+	taskChannel := make(chan Task)
 
 	wg.Add(maxWorkersCount)
 	for i := 0; i < maxWorkersCount; i++ {
 		go func() {
 			defer wg.Done()
 			for task := range taskChannel {
-				if err := task(); err != nil && maxErrorsCount32 > 0 {
-					if atomic.LoadInt32(&errCounter) >= maxErrorsCount32 {
-						return
-					}
+				if atomic.LoadInt32(&errCounter) >= maxErrorsCount32 && maxErrorsCount32 > 0 {
+					continue
+				}
+				if err := task(); err != nil {
 					atomic.AddInt32(&errCounter, 1)
 				}
 			}
 		}()
 	}
 	for _, t := range tasks {
-		taskChannel <- t
+		if t != nil {
+			taskChannel <- t
+		}
 	}
 	close(taskChannel)
 	wg.Wait()
