@@ -17,17 +17,17 @@ jobs:
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: ~1.19
+          go-version: ~1.21
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Linters
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.50.1
+          version: v1.55.2
           working-directory: ${{ env.BRANCH }}
 
   tests:
@@ -38,9 +38,9 @@ jobs:
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: ^1.19
+          go-version: ^1.21
 
       - name: Check out code
         uses: actions/checkout@v3
@@ -65,7 +65,7 @@ jobs:
     if: contains(github.ref, 'calendar')
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ^1.19
 
