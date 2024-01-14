@@ -28,9 +28,6 @@ func Run(tasks []Task, maxWorkersCount, maxErrorsCount int) error {
 		go func() {
 			defer wg.Done()
 			for task := range taskChannel {
-				if atomic.LoadInt32(&errCounter) >= maxErrorsCount32 && maxErrorsCount32 > 0 {
-					continue
-				}
 				if err := task(); err != nil {
 					atomic.AddInt32(&errCounter, 1)
 				}
@@ -38,6 +35,9 @@ func Run(tasks []Task, maxWorkersCount, maxErrorsCount int) error {
 		}()
 	}
 	for _, t := range tasks {
+		if atomic.LoadInt32(&errCounter) >= maxErrorsCount32 && maxErrorsCount32 > 0 {
+			break
+		}
 		if t != nil {
 			taskChannel <- t
 		}
