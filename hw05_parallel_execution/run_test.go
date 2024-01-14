@@ -141,7 +141,7 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("check if <nil> in tasks slice has <nil>", func(t *testing.T) {
+	t.Run("check if <nil> in tasks slice", func(t *testing.T) {
 		var realTaskCount int32 = 2
 		tasks := make([]Task, 0)
 		var runTasksCount int32
