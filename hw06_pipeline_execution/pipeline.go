@@ -22,13 +22,13 @@ func manager(in In, done In) Out {
 		defer close(output)
 		for {
 			select {
-			case <-done:
-				return
 			case v, ok := <-in:
 				if !ok {
 					return
 				}
 				output <- v
+			case <-done:
+				return
 			}
 		}
 	}()
