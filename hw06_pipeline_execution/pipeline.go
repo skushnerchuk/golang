@@ -36,6 +36,7 @@ func stageRunner(in In, done In) Out {
 				output <- v
 			case <-done:
 				return
+			default:
 			}
 		}
 	}()
