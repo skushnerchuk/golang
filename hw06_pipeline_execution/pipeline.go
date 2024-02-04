@@ -1,5 +1,7 @@
 package hw06pipelineexecution
 
+import "time"
+
 type (
 	In  = <-chan interface{}
 	Out = In
@@ -37,6 +39,7 @@ func stageRunner(in In, done In) Out {
 			case <-done:
 				return
 			default:
+				time.Sleep(10 * time.Millisecond)
 			}
 		}
 	}()
