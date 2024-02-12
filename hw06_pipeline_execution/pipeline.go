@@ -55,6 +55,6 @@ func stageWrapper(done In) Stage {
 }
 
 func drain(ch Out) {
-	for range ch {
+	for range ch { //revive:disable-line:empty-block
 	}
 }
