@@ -12,56 +12,49 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 	if in == nil || len(stages) == 0 {
 		return nil
 	}
-
-	out := make(Bi)
-	prev := in
-	for _, stage := range stages {
-		if stage == nil {
-			continue
-		}
-		bufChannel := make(Bi)
-		go channelWrapper(bufChannel, prev, done)
-		next := make(Bi)
-		go stageRunner(stage, bufChannel, next, done)
-		prev = next
-	}
-
+	out := make(chan any)
 	go func() {
 		defer close(out)
-		for {
-			select {
-			case <-done:
-				return
-			case v, ok := <-prev:
-				if !ok {
-					return
-				}
-				out <- v
+
+		sc := stageWrapper(done)
+		next := in
+		for _, s := range stages {
+			if s != nil {
+				next = s(sc(next))
 			}
 		}
+		last := sc(next)
+		for v := range last {
+			out <- v
+		}
 	}()
-
 	return out
 }
 
-func channelWrapper(bufChannel Bi, in In, done In) {
-	defer close(bufChannel)
-	for v := range in {
-		select {
-		case bufChannel <- v:
-		case <-done:
-			return
-		}
+func stageWrapper(done In) Stage {
+	return func(in In) Out {
+		out := make(Bi)
+		go func() {
+			defer close(out)
+
+			for {
+				select {
+				case <-done:
+					go drain(in)
+					return
+				case v, ok := <-in:
+					if !ok {
+						return
+					}
+					out <- v
+				}
+			}
+		}()
+		return out
 	}
 }
 
-func stageRunner(stage Stage, in In, next Bi, done In) {
-	defer close(next)
-	for v := range stage(in) {
-		select {
-		case next <- v:
-		case <-done:
-			return
-		}
+func drain(ch Out) {
+	for range ch {
 	}
 }
