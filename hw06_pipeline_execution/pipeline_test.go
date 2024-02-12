@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require" //nolint:all
 )
 
 const (
@@ -89,5 +89,51 @@ func TestPipeline(t *testing.T) {
 
 		require.Len(t, result, 0)
 		require.Less(t, int64(elapsed), int64(abortDur)+int64(fault))
+	})
+
+	t.Run("nil in && empty stages case", func(t *testing.T) {
+		in := make(Bi)
+		data := []int{1, 2, 3, 4, 5}
+
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		s := ExecutePipeline(nil, nil, stages...)
+		require.Nil(t, s)
+
+		emptyStages := make([]Stage, 0)
+		s = ExecutePipeline(in, nil, emptyStages...)
+		require.Nil(t, s)
+
+		s = ExecutePipeline(in, nil)
+		require.Nil(t, s)
+	})
+
+	t.Run("nil in stages case", func(t *testing.T) {
+		in := make(Bi)
+		data := []int{2, 2}
+
+		go func() {
+			for _, v := range data {
+				in <- v
+			}
+			close(in)
+		}()
+
+		stagesWithNil := []Stage{
+			g("Multiplier (* 2)", func(v interface{}) interface{} { return v.(int) * 2 }),
+			nil,
+		}
+		res := make([]int, 0)
+		for s := range ExecutePipeline(in, nil, stagesWithNil...) {
+			if s != nil {
+				res = append(res, s.(int))
+			}
+		}
+		require.Equal(t, []int{4, 4}, res)
 	})
 }
