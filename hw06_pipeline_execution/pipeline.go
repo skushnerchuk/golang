@@ -40,7 +40,10 @@ func stageWrapper(done In) Stage {
 			for {
 				select {
 				case <-done:
-					go drain(in)
+					go func(in In) {
+						for range in { //revive:disable-line:empty-block
+						}
+					}(in)
 					return
 				case v, ok := <-in:
 					if !ok {
@@ -51,10 +54,5 @@ func stageWrapper(done In) Stage {
 			}
 		}()
 		return out
-	}
-}
-
-func drain(ch Out) {
-	for range ch { //revive:disable-line:empty-block
 	}
 }
