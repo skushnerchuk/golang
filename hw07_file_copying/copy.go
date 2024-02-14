@@ -24,22 +24,21 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return fmt.Errorf("%w: non-regular file %v", ErrUnsupportedFile, fromPath)
 	}
 
-	fileFrom, err := os.OpenFile(fromPath, os.O_RDONLY, 0o666)
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrUnsupportedFile, err)
-	}
-	defer func() { _ = fileFrom.Close() }()
-
 	size := info.Size()
-
 	if offset > size {
 		return fmt.Errorf("%w: offset %d, file size: %d", ErrOffsetExceedsFileSize, offset, size)
 	}
 
+	fileFrom, err := os.OpenFile(fromPath, os.O_RDONLY, 0o666)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = fileFrom.Close() }()
+
 	if limit == 0 {
 		limit = size
 	}
-	if (size - offset) < limit {
+	if limit > (size - offset) {
 		limit = size - offset
 	}
 
