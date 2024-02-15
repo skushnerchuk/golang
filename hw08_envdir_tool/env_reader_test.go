@@ -41,6 +41,6 @@ func TestReadDir(t *testing.T) {
 		defer func() { _ = os.RemoveAll(d) }()
 		env, err := ReadDir(d)
 		require.Len(t, env, 0)
-		require.Nil(t, err)
+		require.NoError(t, err)
 	})
 }
