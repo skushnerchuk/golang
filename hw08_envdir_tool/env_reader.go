@@ -49,7 +49,7 @@ func ReadDir(dir string) (Environment, error) {
 	}
 
 	for _, f := range files {
-		if !isCorrectFile(f) || err != nil {
+		if !isCorrectFile(f) {
 			continue
 		}
 		fullName := filepath.Join(dir, f.Name())
