@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"unicode"
 )
 
 type Environment map[string]EnvValue
@@ -23,7 +22,9 @@ func isCorrectFile(fileInfo os.DirEntry) bool {
 
 func clearValue(value []byte) string {
 	value = bytes.ReplaceAll(value, []byte{0x00}, []byte("\n"))
-	return strings.TrimRightFunc(string(value), unicode.IsSpace)
+	return strings.TrimRightFunc(string(value), func(r rune) bool {
+		return r == '\t' || r == ' '
+	})
 }
 
 func readLine(filename string) ([]byte, error) {
