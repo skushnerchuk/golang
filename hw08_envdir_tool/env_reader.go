@@ -17,8 +17,8 @@ type EnvValue struct {
 	NeedRemove bool
 }
 
-func isCorrectFile(fileInfo os.FileInfo) bool {
-	return fileInfo.Mode().IsRegular() && !strings.Contains(fileInfo.Name(), "=")
+func isCorrectFile(fileInfo os.DirEntry) bool {
+	return fileInfo.Type().IsRegular() && !strings.Contains(fileInfo.Name(), "=")
 }
 
 func clearValue(value []byte) string {
@@ -50,20 +50,21 @@ func readLine(filename string) ([]byte, error) {
 func ReadDir(dir string) (Environment, error) {
 	env := make(Environment)
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err == nil && isCorrectFile(info) {
-			value, readErr := readLine(path)
-			if readErr == nil {
-				name := filepath.Base(path)
-				env[name] = EnvValue{clearValue(value), info.Size() == 0}
-				return nil
-			}
-			return readErr
-		}
-		return err
-	})
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, f := range files {
+		if !isCorrectFile(f) || err != nil {
+			continue
+		}
+		fullName := filepath.Join(dir, f.Name())
+		value, readErr := readLine(fullName)
+		if readErr == nil {
+			info, _ := f.Info()
+			env[f.Name()] = EnvValue{clearValue(value), info.Size() == 0}
+		}
 	}
 
 	return env, nil
