@@ -34,14 +34,13 @@ func RunCmd(cmd []string, environment Environment) (returnCode int) {
 		return -1
 	}
 
-	command := exec.Command(cmd[0], cmd[1:]...)
+	command := exec.Command(cmd[0], cmd[1:]...) //nolint:gosec
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 	command.Env = env
 
 	err = command.Run()
-
 	if err != nil {
 		fmt.Println(err)
 	}

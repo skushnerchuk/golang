@@ -29,7 +29,7 @@ func clearValue(value []byte) string {
 	parts := strings.Split(vStr, "\n")
 	if len(parts) > 0 {
 		vBytes := []byte(parts[0])
-		vBytes = bytes.Replace(vBytes, []byte{0x00}, []byte("\n"), -1)
+		vBytes = bytes.ReplaceAll(vBytes, []byte{0x00}, []byte("\n"))
 		return string(vBytes)
 	}
 	return ""

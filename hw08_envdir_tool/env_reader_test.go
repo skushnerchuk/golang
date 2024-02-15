@@ -1,14 +1,13 @@
 package main
 
 import (
-	//nolint:depguard
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require" //nolint:depguard
 )
 
 func TestReadDir(t *testing.T) {
-
 	t.Run("env values", func(t *testing.T) {
 		valid := Environment{
 			"BAR":   {Value: "bar", NeedRemove: false},
