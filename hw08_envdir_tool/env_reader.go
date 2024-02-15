@@ -18,9 +18,7 @@ type EnvValue struct {
 }
 
 func isCorrectFile(fileInfo os.FileInfo) bool {
-	return !fileInfo.IsDir() &&
-		fileInfo.Mode().IsRegular() &&
-		!strings.Contains(fileInfo.Name(), "=")
+	return fileInfo.Mode().IsRegular() && !strings.Contains(fileInfo.Name(), "=")
 }
 
 func clearValue(value []byte) string {
@@ -41,6 +39,7 @@ func readLine(filename string) ([]byte, error) {
 		return nil, err
 	}
 	defer func() { _ = f.Close() }()
+
 	scanner := bufio.NewScanner(f)
 	scanner.Scan()
 	return scanner.Bytes(), nil
@@ -59,7 +58,7 @@ func ReadDir(dir string) (Environment, error) {
 				env[name] = EnvValue{clearValue(value), info.Size() == 0}
 				return nil
 			}
-			return err
+			return readErr
 		}
 		return err
 	})
