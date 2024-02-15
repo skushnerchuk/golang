@@ -22,15 +22,8 @@ func isCorrectFile(fileInfo os.DirEntry) bool {
 }
 
 func clearValue(value []byte) string {
-	vStr := string(value)
-	vStr = strings.TrimRightFunc(vStr, unicode.IsSpace)
-	parts := strings.Split(vStr, "\n")
-	if len(parts) > 0 {
-		vBytes := []byte(parts[0])
-		vBytes = bytes.ReplaceAll(vBytes, []byte{0x00}, []byte("\n"))
-		return string(vBytes)
-	}
-	return ""
+	value = bytes.ReplaceAll(value, []byte{0x00}, []byte("\n"))
+	return strings.TrimRightFunc(string(value), unicode.IsSpace)
 }
 
 func readLine(filename string) ([]byte, error) {
