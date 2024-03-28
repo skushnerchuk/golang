@@ -1,60 +1,76 @@
 package hw09structvalidator
 
 import (
-	"encoding/json"
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require" //nolint:all
 )
 
-type UserRole string
+type TestCase struct {
+	Name        string
+	Param       interface{}
+	ExpectedErr error
+}
 
-// Test the function on different structures and other types.
-type (
-	User struct {
-		ID     string `json:"id" validate:"len:36"`
-		Name   string
-		Age    int             `validate:"min:18|max:50"`
-		Email  string          `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
-		Role   UserRole        `validate:"in:admin,stuff"`
-		Phones []string        `validate:"len:11"`
-		meta   json.RawMessage //nolint:unused
+func TestCheckParamIsStructure(t *testing.T) {
+	type v struct {
+		SameField string
 	}
 
-	App struct {
-		Version string `validate:"len:5"`
+	cases := []TestCase{
+		{Name: "struct by value", Param: v{SameField: ""}, ExpectedErr: nil},
+		{Name: "struct by pointer", Param: &v{SameField: ""}, ExpectedErr: nil},
+		{Name: "number instead struct", Param: 5, ExpectedErr: ErrNotStruct},
+		{Name: "<nil> instead struct", Param: nil, ExpectedErr: ErrNotStruct},
 	}
 
-	Token struct {
-		Header    []byte
-		Payload   []byte
-		Signature []byte
+	for _, c := range cases {
+		t.Log(c.Name)
+		err := Validate(c.Param)
+		require.Equal(t, err, c.ExpectedErr)
+	}
+}
+
+func TestUnsupportedRules(t *testing.T) {
+	type v struct {
+		SameField string `validate:"required:10"`
 	}
 
-	Response struct {
-		Code int    `validate:"in:200,404,500"`
-		Body string `json:"omitempty"`
-	}
-)
-
-func TestValidate(t *testing.T) {
-	tests := []struct {
-		in          interface{}
-		expectedErr error
-	}{
+	cases := []TestCase{
 		{
-			// Place your code here.
+			Name:  "unsupported rule",
+			Param: v{SameField: ""},
+			ExpectedErr: ValidationErrors{
+				ValidationError{Field: "SameField", Err: ErrValidationUnsupportedRule},
+			},
 		},
-		// ...
-		// Place your code here.
 	}
 
-	for i, tt := range tests {
-		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
-			tt := tt
-			t.Parallel()
+	for _, c := range cases {
+		t.Log(c.Name)
+		err := Validate(c.Param)
+		require.Equal(t, err, c.ExpectedErr)
+	}
+}
 
-			// Place your code here.
-			_ = tt
-		})
+func TestUnsupportedType(t *testing.T) {
+	type v struct {
+		SameField float64 `validate:"min:10.55"`
+	}
+
+	cases := []TestCase{
+		{
+			Name:  "unsupported type",
+			Param: v{SameField: 9.0},
+			ExpectedErr: ValidationErrors{
+				ValidationError{Field: "SameField", Err: ErrValidationType},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Log(c.Name)
+		err := Validate(c.Param)
+		require.Equal(t, err, c.ExpectedErr)
 	}
 }
